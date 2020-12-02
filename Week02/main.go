@@ -10,7 +10,7 @@ import (
 
 // you should only handle errors once
 func main() {
-	user, err := Biz(1)
+	user, err := Biz(12)
 	if err != nil {
 		log.Printf("%T %v\n", errors.Cause(err), errors.Cause(err))
 		log.Printf("stack trace: \n%+v\n", err)
@@ -36,7 +36,7 @@ type User struct {
 }
 
 func Dao(id uint) (user User, err error) {
-	db, err := sql.Open("mysql", "root:uUiknmbGFDBIu9801827654@tcp(127.0.0.1:3307)/shop?parseTime=true")
+	db, err := sql.Open("mysql", "root:uUiknmbGFDBIu9801827654@tcp(127.0.0.1:3307)/acg?parseTime=true")
 	if err != nil {
 		return user, errors.New("数据库链接失败")
 	}
@@ -47,5 +47,5 @@ func Dao(id uint) (user User, err error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		return
 	}
-	return
+	return user,errors.Wrap(err, "出错了")
 }
