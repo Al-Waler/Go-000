@@ -14,13 +14,13 @@ import (
 
 var c chan os.Signal
 
-func init()  {
+func init() {
 	c = make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt,syscall.SIGQUIT)
+	signal.Notify(c, os.Interrupt, syscall.SIGQUIT)
 }
 
 func main() {
-	g,ctx:=errgroup.WithContext(context.Background())
+	g, ctx := errgroup.WithContext(context.Background())
 	g.Go(func() error {
 		return serveApp(ctx)
 	})
@@ -34,11 +34,10 @@ func main() {
 	}
 }
 
-
 func serveApp(ctx context.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
-			errors.Wrap(fmt.Errorf("v",r), "serve app panic")
+			errors.Wrap(fmt.Errorf("v", r), "serve app panic")
 		}
 	}()
 
@@ -66,7 +65,7 @@ func serveApp(ctx context.Context) error {
 func serveDebug(ctx context.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
-			errors.Wrap(fmt.Errorf("%v",r), "debug app panic")
+			errors.Wrap(fmt.Errorf("%v", r), "debug app panic")
 		}
 	}()
 	mux := http.NewServeMux()
@@ -79,7 +78,6 @@ func serveDebug(ctx context.Context) error {
 		Handler: mux,
 	}
 
-
 	go func() {
 		select {
 		case <-c:
@@ -90,4 +88,3 @@ func serveDebug(ctx context.Context) error {
 	}()
 	return errors.Wrap(s.ListenAndServe(), "debug err")
 }
-
