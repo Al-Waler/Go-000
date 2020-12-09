@@ -13,17 +13,20 @@ import (
 )
 
 var c chan os.Signal
-var stop chan struct{}
+
 func init()  {
-	stop = make(chan struct{})
 	c = make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt,syscall.SIGQUIT)
 }
 
 func main() {
-	g:=new(errgroup.Group)
-	g.Go(serveApp)
-	g.Go(serveDebug)
+	g,ctx:=errgroup.WithContext(context.Background())
+	g.Go(func() error {
+		return serveApp(ctx)
+	})
+	g.Go(func() error {
+		return serveDebug(ctx)
+	})
 
 	if err := g.Wait(); err != nil {
 		log.Printf("error:%T %v\n", errors.Cause(err), errors.Cause(err))
@@ -32,7 +35,7 @@ func main() {
 }
 
 
-func serveApp() error {
+func serveApp(ctx context.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
 			errors.Wrap(fmt.Errorf("v",r), "serve app panic")
@@ -53,15 +56,14 @@ func serveApp() error {
 		select {
 		case <-c:
 			s.Shutdown(context.Background())
-			close(stop)
-		case <-stop:
+		case <-ctx.Done():
 			s.Shutdown(context.Background())
 		}
 	}()
 	return errors.Wrap(s.ListenAndServe(), "app err")
 }
 
-func serveDebug() error {
+func serveDebug(ctx context.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
 			errors.Wrap(fmt.Errorf("%v",r), "debug app panic")
@@ -82,8 +84,7 @@ func serveDebug() error {
 		select {
 		case <-c:
 			s.Shutdown(context.Background())
-			close(stop)
-		case <-stop:
+		case <-ctx.Done():
 			s.Shutdown(context.Background())
 		}
 	}()
