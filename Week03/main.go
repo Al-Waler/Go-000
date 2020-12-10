@@ -37,7 +37,7 @@ func main() {
 func serveApp(ctx context.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
-			errors.Wrap(fmt.Errorf("v", r), "serve app panic")
+			errors.Wrap(fmt.Errorf("%v", r), "serve app panic")
 		}
 	}()
 
