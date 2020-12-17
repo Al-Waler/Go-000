@@ -36,7 +36,7 @@ type User struct {
 }
 
 func Dao(id uint) (user User, err error) {
-	db, err := sql.Open("mysql", "root:uUiknmbGFDBIu9801827654@tcp(127.0.0.1:3307)/acg?parseTime=true")
+	db, err := sql.Open("mysql", "root:uUiknmbGFDBIu9801827654@tcp(127.0.0.1:3307)/server?parseTime=true")
 	if err != nil {
 		return user, errors.New("数据库链接失败")
 	}
