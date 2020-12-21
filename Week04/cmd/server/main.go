@@ -11,16 +11,16 @@ import (
 	"syscall"
 )
 
-func main()  {
+func main() {
 	fmt.Println("start")
-	c:=make(chan os.Signal, 1)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGQUIT)
 
-	g:=new(errgroup.Group)
+	g := new(errgroup.Group)
 	g.Go(func() error {
-		_,cf,err:=data.InitApp()
-		if err!=nil {
-			panic(err)
+		_, cf, err := data.InitApp()
+		if err != nil {
+			return err
 		}
 		<-c
 		cf()

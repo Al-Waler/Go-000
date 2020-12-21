@@ -25,8 +25,9 @@ func New() (s *http.Server, err error) {
 		if err = s.ListenAndServe(); err != nil {
 			if err != http.ErrServerClosed {
 				err = errors.Wrap(err, "http server error")
-				return
+				panic(err)
 			}
+			panic(err)
 		}
 	}()
 
@@ -37,7 +38,7 @@ func initRoute(r *gin.Engine)  {
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, Response{
 			Code: 2000,
-			Msg:  "Hello Word",
+			Msg:  "Hello World",
 		})
 	})
 }
